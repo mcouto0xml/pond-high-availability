@@ -1,0 +1,161 @@
+# =============================================================================
+# UNIVERSAL .GITIGNORE — Terraform + Go
+# =============================================================================
+
+# =============================================================================
+# TERRAFORM
+# =============================================================================
+
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform lock file (commit this if você quiser runs reproduzíveis)
+# .terraform.lock.hcl
+
+# State files — NUNCA commitar (podem conter secrets)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Plan files
+*.tfplan
+*.plan
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json
+!example.tfvars
+!example.tfvars.json
+
+# Override files (overrides locais, não para compartilhar)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI config
+.terraformrc
+terraform.rc
+
+# =============================================================================
+# GO
+# =============================================================================
+
+# Compiled binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
+
+# Test cache and coverage
+*.test
+*.out
+coverage.txt
+coverage.html
+/tmp/
+
+# Go workspace
+go.work
+go.work.sum
+
+# Vendor directory (descomente se não estiver usando vendor)
+# vendor/
+
+# Air (live reload tool)
+tmp/
+
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# =============================================================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+secrets.yaml
+secrets.yml
+secrets.json
+
+# =============================================================================
+# OS
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
+
+# =============================================================================
+# EDITORS & IDES
+# =============================================================================
+
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# JetBrains (GoLand, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+
+# =============================================================================
+# LOGS & TEMP
+# =============================================================================
+
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# =============================================================================
+# CI/CD & CLOUD
+# =============================================================================
+
+# GitHub Actions artifacts
+.act/
+
+# AWS credentials
+.aws/credentials
+
+# Google Cloud
+.gcloud/
+gcloud-service-key.json
