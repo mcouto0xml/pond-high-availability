@@ -1,0 +1,8 @@
+project_id = "ponderada"
+tasks_name = "fila-bacana"
+region = "us-central1"
+admin_email = "email-do-admin@gmail.com"
+supabase_access_token = "acesstokenbemgrandequepegadiretamentenosupabase"
+database_region = "us-east-1"
+database_password = "SenhaSecreta123"
+supabase_org_id = "abcdefghijklmnopq"

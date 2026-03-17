@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Supabase Database Schema — IoT Telemetry",
+  "description": "Schema das tabelas de dispositivos e telemetria para sensores IoT no PostgreSQL (Supabase)",
+  "version": "2.0.0",
+
+  "migrations": [
+    {
+      "version": "001",
+      "description": "Cria tabela de dispositivos IoT e tabela telemetry com FK",
+      "sql": [
+        "-- Tabela de dispositivos IoT",
+        "CREATE TABLE IF NOT EXISTS public.devices (",
+        "  id          BIGSERIAL    PRIMARY KEY,",
+        "  name        TEXT         NOT NULL,",
+        "  description TEXT,",
+        "  created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()",
+        ");",
+
+        "COMMENT ON TABLE  public.devices             IS 'Cadastro dos dispositivos IoT';",
+        "COMMENT ON COLUMN public.devices.id          IS 'Identificador único do dispositivo (autoincrement)';",
+        "COMMENT ON COLUMN public.devices.name        IS 'Nome descritivo do dispositivo';",
+        "COMMENT ON COLUMN public.devices.description IS 'Descrição ou localização do dispositivo';",
+
+        "-- Tabela de telemetria",
+        "CREATE TABLE IF NOT EXISTS public.telemetry (",
+        "  id          BIGSERIAL    PRIMARY KEY,",
+        "  iot_id      BIGINT       NOT NULL REFERENCES public.devices(id) ON DELETE CASCADE,",
+        "  temperature FLOAT8       NOT NULL,",
+        "  humidity    FLOAT8       NOT NULL,",
+        "  presence    BOOLEAN      NOT NULL DEFAULT FALSE,",
+        "  vibration   FLOAT8       NOT NULL,",
+        "  luminosity  FLOAT8       NOT NULL,",
+        "  tank_level  FLOAT8       NOT NULL,",
+        "  created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()",
+        ");",
+
+        "-- Índice para consultas por data (série temporal)",
+        "CREATE INDEX IF NOT EXISTS idx_telemetry_created_at",
+        "  ON public.telemetry (created_at DESC);",
+
+        "-- Índice para filtros por dispositivo",
+        "CREATE INDEX IF NOT EXISTS idx_telemetry_iot_id",
+        "  ON public.telemetry (iot_id);",
+
+        "-- Habilita Row Level Security",
+        "ALTER TABLE public.devices   ENABLE ROW LEVEL SECURITY;",
+        "ALTER TABLE public.telemetry ENABLE ROW LEVEL SECURITY;",
+
+        "-- Políticas: devices",
+        "CREATE POLICY \"devices_allow_read\" ON public.devices",
+        "  FOR SELECT USING (true);",
+        "CREATE POLICY \"devices_allow_insert_authenticated\" ON public.devices",
+        "  FOR INSERT WITH CHECK (auth.role() = 'authenticated');",
+
+        "-- Políticas: telemetry",
+        "CREATE POLICY \"telemetry_allow_read\" ON public.telemetry",
+        "  FOR SELECT USING (true);",
+        "CREATE POLICY \"telemetry_allow_insert_authenticated\" ON public.telemetry",
+        "  FOR INSERT WITH CHECK (auth.role() = 'authenticated');",
+
+        "-- Comentários nas colunas de telemetry",
+        "COMMENT ON TABLE  public.telemetry             IS 'Registros de telemetria de sensores IoT';",
+        "COMMENT ON COLUMN public.telemetry.id          IS 'Identificador sequencial do registro';",
+        "COMMENT ON COLUMN public.telemetry.iot_id      IS 'FK para o dispositivo IoT que enviou a mensagem';",
+        "COMMENT ON COLUMN public.telemetry.temperature IS 'Temperatura em graus Celsius (°C)';",
+        "COMMENT ON COLUMN public.telemetry.humidity    IS 'Umidade relativa do ar em porcentagem (%)';",
+        "COMMENT ON COLUMN public.telemetry.presence    IS 'Detecção de presença (true = detectado)';",
+        "COMMENT ON COLUMN public.telemetry.vibration   IS 'Intensidade de vibração (m/s²)';",
+        "COMMENT ON COLUMN public.telemetry.luminosity  IS 'Luminosidade em lux (lx)';",
+        "COMMENT ON COLUMN public.telemetry.tank_level  IS 'Nível do tanque em porcentagem (0.0 a 100.0)';"
+      ]
+    }
+  ],
+
+  "tables": {
+    "devices": {
+      "schema": "public",
+      "description": "Cadastro dos dispositivos IoT",
+      "rls_enabled": true,
+      "columns": {
+        "id": {
+          "type": "bigserial",
+          "primary_key": true,
+          "nullable": false,
+          "description": "Identificador único do dispositivo (autoincrement)"
+        },
+        "name": {
+          "type": "text",
+          "nullable": false,
+          "description": "Nome descritivo do dispositivo"
+        },
+        "description": {
+          "type": "text",
+          "nullable": true,
+          "description": "Descrição ou localização do dispositivo"
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()",
+          "description": "Timestamp de cadastro do dispositivo (UTC)"
+        }
+      },
+      "policies": [
+        {
+          "name": "devices_allow_read",
+          "command": "SELECT",
+          "using": "true",
+          "description": "Permite leitura pública dos dispositivos"
+        },
+        {
+          "name": "devices_allow_insert_authenticated",
+          "command": "INSERT",
+          "with_check": "auth.role() = 'authenticated'",
+          "description": "Permite cadastro de dispositivos apenas para usuários autenticados"
+        }
+      ]
+    },
+
+    "telemetry": {
+      "schema": "public",
+      "description": "Registros de telemetria de sensores IoT",
+      "rls_enabled": true,
+      "columns": {
+        "id": {
+          "type": "bigserial",
+          "primary_key": true,
+          "nullable": false,
+          "description": "Identificador sequencial do registro (autoincrement)"
+        },
+        "iot_id": {
+          "type": "bigint",
+          "nullable": false,
+          "foreign_key": {
+            "table": "public.devices",
+            "column": "id",
+            "on_delete": "CASCADE"
+          },
+          "description": "FK para o dispositivo IoT que enviou a mensagem"
+        },
+        "temperature": {
+          "type": "float8",
+          "nullable": false,
+          "unit": "°C",
+          "description": "Temperatura em graus Celsius"
+        },
+        "humidity": {
+          "type": "float8",
+          "nullable": false,
+          "unit": "%",
+          "description": "Umidade relativa do ar em porcentagem"
+        },
+        "presence": {
+          "type": "boolean",
+          "nullable": false,
+          "default": false,
+          "description": "Detecção de presença — true indica presença detectada"
+        },
+        "vibration": {
+          "type": "float8",
+          "nullable": false,
+          "unit": "m/s²",
+          "description": "Intensidade de vibração em metros por segundo ao quadrado"
+        },
+        "luminosity": {
+          "type": "float8",
+          "nullable": false,
+          "unit": "lx",
+          "description": "Luminosidade em lux"
+        },
+        "tank_level": {
+          "type": "float8",
+          "nullable": false,
+          "unit": "%",
+          "description": "Nível do tanque em porcentagem (0.0 a 100.0)"
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()",
+          "description": "Timestamp de criação do registro (UTC)"
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_telemetry_created_at",
+          "columns": ["created_at"],
+          "order": "DESC",
+          "description": "Índice para consultas de série temporal ordenadas por data"
+        },
+        {
+          "name": "idx_telemetry_iot_id",
+          "columns": ["iot_id"],
+          "description": "Índice para filtros e JOINs por dispositivo"
+        }
+      ],
+      "policies": [
+        {
+          "name": "telemetry_allow_read",
+          "command": "SELECT",
+          "using": "true",
+          "description": "Permite leitura pública dos registros"
+        },
+        {
+          "name": "telemetry_allow_insert_authenticated",
+          "command": "INSERT",
+          "with_check": "auth.role() = 'authenticated'",
+          "description": "Permite inserção apenas para usuários autenticados"
+        }
+      ]
+    }
+  }
+}
