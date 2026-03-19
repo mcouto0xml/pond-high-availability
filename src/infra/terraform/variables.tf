@@ -38,3 +38,23 @@ variable "admin_email" {
   type        = string
   description = "Email do usuário com permissão de Admin no Cloud Tasks"
 }
+
+variable "ar_repository_id" {
+  type = string
+  description = "Nome do Artifact Registry"
+} 
+
+variable "ar_description" {
+  type = string
+  description = "Descrição do Artifact Registry"
+}
+
+variable "ar_enable_cleanup_policy" {
+  type = bool
+  description = "Política de limpeza"
+}
+
+variable "ar_labels" {
+  type = map(string)
+  description = "Labels do Artifact Registry"
+}

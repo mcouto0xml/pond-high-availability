@@ -6,3 +6,10 @@ supabase_access_token = "acesstokenbemgrandequepegadiretamentenosupabase"
 database_region = "us-east-1"
 database_password = "SenhaSecreta123"
 supabase_org_id = "abcdefghijklmnopq"
+ar_repository_id = "cloud_functions_repository"
+ar_description = "Artifact Registry para as Cloud Functions"
+ar_enable_cleanup_policy = true
+ar_labels = {
+  "managed" = "terraform"
+  "app" = "cloud_functions"
+}
