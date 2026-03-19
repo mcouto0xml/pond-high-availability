@@ -1,4 +1,4 @@
-name: Build & Push to Artifact Registry (WIF)
+name: Build & Push Go Module to Artifact Registry
 
 on:
   push:
@@ -9,19 +9,19 @@ on:
       - main
 
 env:
+  MODULE_PATH: consumer
+
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GAR_LOCATION: us-central1
   GAR_REPOSITORY: cloud-functions-repository
-  IMAGE_NAME: consumer
 
-# Permissão obrigatória para o WIF gerar o token OIDC
 permissions:
   contents: read
   id-token: write
 
 jobs:
   build-and-push:
-    name: Build Go & Push to Artifact Registry
+    name: Build & Push Go Module
     runs-on: ubuntu-latest
 
     steps:
@@ -36,15 +36,13 @@ jobs:
           go-version: "1.22"
           cache: true
 
-      # 4. Compila o binário Go
-      - name: Build Go binary
+      # 3. Valida que o módulo compila corretamente
+      - name: Build module
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-            -ldflags="-w -s" \
-            -o ./bin/app \
-            ./src/backend/consumer/internal      # Ajuste o entrypoint do seu projeto
+          go build ./src/backend/consumer
+          go vet ./src/backend/consumer
 
-      # 5. Autentica no GCP via Workload Identity Federation (sem chave JSON!)
+      # 5. Autentica no GCP via Workload Identity Federation
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
@@ -56,36 +54,57 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      # 7. Configura o Docker para usar o Artifact Registry
-      - name: Configure Docker for Artifact Registry
+      # 7. Configura o GOPROXY para apontar para o Artifact Registry
+      - name: Configure Go proxy for Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
+          GAR_HOST="${{ env.GAR_LOCATION }}-go.pkg.dev"
+          REPO_URL="https://${GAR_HOST}/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}"
 
-      # 8. Extrai metadados para tagging da imagem
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=,format=short
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          # Configura autenticação do Go com o Artifact Registry
+          gcloud artifacts print-settings go \
+            --repository="${{ env.GAR_REPOSITORY }}" \
+            --location="${{ env.GAR_LOCATION }}" \
+            --project="${{ env.GCP_PROJECT_ID }}"
 
-      # 9. Build e Push da imagem Docker
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: ${{ github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            APP_VERSION=${{ github.sha }}
+          # Define o GOPROXY apontando para o Artifact Registry primeiro
+          echo "GOPROXY=https://${GAR_HOST}/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }},direct" >> $GITHUB_ENV
+          echo "GONOSUMCHECK=${GAR_HOST}/*" >> $GITHUB_ENV
+          echo "GONOSUMDB=${GAR_HOST}/*" >> $GITHUB_ENV
 
-      # 10. Exibe a imagem publicada
-      - name: Print image URL
+      # 8. Configura credenciais do Go para o Artifact Registry
+      - name: Configure Go credentials
+        run: |
+          # Gera o access token e configura o netrc para autenticação
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          GAR_HOST="${{ env.GAR_LOCATION }}-go.pkg.dev"
+
+          echo "machine ${GAR_HOST} login oauth2accesstoken password ${ACCESS_TOKEN}" >> ~/.netrc
+          chmod 600 ~/.netrc
+
+      # 9. Publica o módulo Go no Artifact Registry
+      - name: Push Go module to Artifact Registry
         if: github.ref == 'refs/heads/main'
         run: |
-          echo "✅ Imagem publicada em:"
-          echo "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.IMAGE_NAME }}"
+          # Extrai a versão da tag git, ou usa o SHA curto como fallback
+          VERSION="${{ github.ref_name }}"
+          if [[ "$VERSION" == "main" ]]; then
+            VERSION="v0.0.0-$(date +%Y%m%d%H%M%S)-$(git rev-parse --short HEAD)"
+          fi
+
+          GAR_HOST="${{ env.GAR_LOCATION }}-go.pkg.dev"
+          REPO_URL="https://${GAR_HOST}/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.MODULE_PATH }}"
+
+          echo "📦 Publicando módulo versão: ${VERSION}"
+
+          # Faz o upload do módulo via GOPROXY
+          GOFLAGS="-mod=mod" GOPROXY="${REPO_URL}" go list -m all
+
+          gcloud artifacts go upload \
+            --repository="${{ env.GAR_REPOSITORY }}" \
+            --location="${{ env.GAR_LOCATION }}" \
+            --project="${{ env.GCP_PROJECT_ID }}" \
+            --module-path="${{ env.MODULE_PATH }}" \
+            --version="${VERSION}" \
+            --source=.
+
+          echo "✅ Módulo publicado: ${{ env.MODULE_PATH }}@${VERSION}"
