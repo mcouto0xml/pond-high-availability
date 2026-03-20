@@ -1,10 +1,10 @@
 package db
 
 import (
-	"consumer/internal/utils"
+	"example.com/consumer/internal/utils"
 	"fmt"
 	"github.com/go-pg/pg/v10"
-	"consumer/internal/models"
+	"example.com/consumer/internal/models"
 	"crypto/tls"
 )
 

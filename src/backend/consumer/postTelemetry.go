@@ -1,10 +1,11 @@
-package function
+package main
 
 import (
-	"consumer/internal/db"
-	"consumer/internal/dbContext"
-	"consumer/internal/dto"
-	"consumer/internal/models"
+	"example.com/consumer/internal/db"
+	"example.com/consumer/internal/dbContext"
+	"example.com/consumer/internal/dto"
+	"example.com/consumer/internal/models"
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,6 +18,8 @@ var once sync.Once
 var dbRepository dbContext.DbImplementation
 
 func init() {
+	functions.HTTP("PostTelemetry", PostTelemetry)
+
 	once.Do(func ()  {
 		var err error
 		err = godotenv.Load()

@@ -1,7 +1,11 @@
-.PHONY: docker-build
-docker-build:
-	docker build -t us-central1-docker.pkg.dev/ponderada/cloud-functions-repository/consumer:latest .
-
-.PHONY: docker-push
-docker-push:
-	docker push us-central1-docker.pkg.dev/ponderada/cloud-functions-repository/consumer:latest
+.PHONY: artefact-build
+artefact-build:
+	gcloud functions deploy PostTelemetry \
+  --project=ponderada \
+  --gen2 \
+  --runtime=go126 \
+  --region=us-central1 \
+  --source=. \
+  --entry-point=PostTelemetry \
+  --trigger-http \
+  --no-allow-unauthenticated
