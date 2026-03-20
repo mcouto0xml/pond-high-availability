@@ -1,10 +1,10 @@
-package main
+package function
 
 import (
-	"example.com/consumer/internal/db"
-	"example.com/consumer/internal/dbContext"
-	"example.com/consumer/internal/dto"
-	"example.com/consumer/internal/models"
+	"function.com/consumer/function/internal/db"
+	"function.com/consumer/function/internal/dbContext"
+	"function.com/consumer/function/internal/dto"
+	"function.com/consumer/function/internal/models"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"encoding/json"
 	"fmt"

@@ -1,4 +1,4 @@
-module example.com/consumer
+module function.com/consumer/function
 
 go 1.25.6
 
