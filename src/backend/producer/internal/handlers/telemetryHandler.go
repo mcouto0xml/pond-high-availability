@@ -13,10 +13,11 @@ type TelemetryInstance struct{
 	ctx 			*context.Context
 	cloudTasks		*config.QueueImplementation
 	workerURL 		string
+	saEmail 		string
 }
 
-func NewTelemetryInstance(ct *config.QueueImplementation, wURL string) TelemetryInstance {
-	return TelemetryInstance{  cloudTasks: ct, workerURL: wURL  }
+func NewTelemetryInstance(ct *config.QueueImplementation, wURL string, saEmail string) TelemetryInstance {
+	return TelemetryInstance{  cloudTasks: ct, workerURL: wURL, saEmail: saEmail,  }
 }
 
 func (t *TelemetryInstance) NewData(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func (t *TelemetryInstance) NewData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.cloudTasks.Context.CreateTask(msg, t.workerURL)
+	err = t.cloudTasks.Context.CreateTask(msg, t.workerURL, t.saEmail)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		resp := dto.TelemetryNewDataResponse{  Message: fmt.Sprint(err),  }

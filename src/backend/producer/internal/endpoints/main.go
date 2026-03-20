@@ -14,10 +14,10 @@ type Router struct{
 	cloudTasks 				*config.QueueImplementation
 }
 
-func NewRouter(mux *http.ServeMux, ct *config.QueueImplementation, wURL string) *Router {
+func NewRouter(mux *http.ServeMux, ct *config.QueueImplementation, wURL string, saEmail string) *Router {
 	// Aqui inicializa as structs de Healthz e Telemtry
 	health := handlers.NewHealthHandler()
-	telemetry := handlers.NewTelemetryInstance(ct, wURL)
+	telemetry := handlers.NewTelemetryInstance(ct, wURL, saEmail)
 
 	r := &Router{	mux: mux, healthInstance: &health, telemetryInstance: &telemetry,  }
 	r.registerRoutes()

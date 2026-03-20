@@ -45,7 +45,7 @@ func (t *TaskEnqueuer) newClient() error {
 	return nil
 }
 
-func (t *TaskEnqueuer) CreateTask(body []byte, workerUrl string) error {
+func (t *TaskEnqueuer) CreateTask(body []byte, workerUrl string, saEmail string) error {
 	req := &taskspb.CreateTaskRequest{
 		Parent: t.QueuePath,
 		Task: &taskspb.Task{
@@ -57,6 +57,12 @@ func (t *TaskEnqueuer) CreateTask(body []byte, workerUrl string) error {
 						"Content-Type": "application/json",
 					},
 					Body: body,
+					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
+						OidcToken: &taskspb.OidcToken{
+							ServiceAccountEmail: saEmail,
+							Audience: workerUrl,
+						},
+					},
 				},
 			},
 		},
