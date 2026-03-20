@@ -52,6 +52,8 @@ func PostTelemetry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Print(req.TankLevel)
+
 	telemetryInstance := models.Telemetry{
 		Temperature: req.Temperature,
 		Humidity: req.Humidity,

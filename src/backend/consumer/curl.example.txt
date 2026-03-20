@@ -1,4 +1,4 @@
-curl -X POST http://localhost:8080/telemetry   -H "Content-Type: application/json"   -d '{
+curl -X POST http://localhost:8080/   -H "Content-Type: application/json"   -d '{
     "iot_name": "sensor-01",
     "temperature": 23.5,
     "humidity": 60.2,
