@@ -23,6 +23,12 @@ resource "google_project_iam_member" "cloud_task_viewer" {
   member  = "serviceAccount:${var.cloud_tasks_sa_email}"
 }
 
+resource "google_project_iam_member" "cloud_task_invoker" {
+  project = var.project_id
+  role = "roles/run.invoker"
+  member = "serviceAccount:${var.cloud_tasks_sa_email}"
+}
+
 # -----------------------------------------------------------------------------
 # Permissão: execução das tasks (invocar o target — Cloud Run / HTTP)
 # -----------------------------------------------------------------------------

@@ -22,7 +22,6 @@ func init() {
 		err = godotenv.Load()
 		if err != nil {
 			fmt.Printf("Erro ao fazer o carregamento do .env: %v", err)
-			return
 		}
 		postgreSql, err := db.StartDB()
 		if err != nil {
