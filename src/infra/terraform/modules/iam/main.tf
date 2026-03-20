@@ -58,33 +58,3 @@ resource "google_project_iam_member" "admin_viewer" {
   role    = "roles/viewer"
   member  = "user:${var.admin_email}"
 }
-
-resource "google_artifact_registry_repository_iam_member" "ar_admin" {
-  project = var.project_id
-  location = var.region
-  repository = var.ar_repository
-  role = "roles/artifactregistry.admin"
-  member = "user:${var.admin_email}"
-}
-
-# ─────────────────────────────────────────────
-# IAM – Leitores do repositório Artifact Registry
-# ─────────────────────────────────────────────
-resource "google_artifact_registry_repository_iam_member" "reader" {
-  project    = var.project_id
-  location   = var.region
-  repository = var.ar_repository
-  role       = "roles/artifactregistry.reader"
-  member     = "serviceAccount:${var.artifact_registry_sa_email}"
-}
-
-# ─────────────────────────────────────────────
-# IAM – Escritores do repositório Artifact Registry
-# ─────────────────────────────────────────────
-resource "google_artifact_registry_repository_iam_member" "writer" {
-  project    = var.project_id
-  location   = var.region
-  repository = var.ar_repository
-  role       = "roles/artifactregistry.writer"
-  member     = "serviceAccount:${var.artifact_registry_sa_email}"
-}
