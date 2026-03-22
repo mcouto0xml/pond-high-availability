@@ -1,10 +1,11 @@
 package function
 
 import (
-	"consumer/internal/db"
-	"consumer/internal/dbContext"
-	"consumer/internal/dto"
-	"consumer/internal/models"
+	"function.com/consumer/function/internal/db"
+	"function.com/consumer/function/internal/dbContext"
+	"function.com/consumer/function/internal/dto"
+	"function.com/consumer/function/internal/models"
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,12 +18,13 @@ var once sync.Once
 var dbRepository dbContext.DbImplementation
 
 func init() {
+	functions.HTTP("PostTelemetry", PostTelemetry)
+
 	once.Do(func ()  {
 		var err error
 		err = godotenv.Load()
 		if err != nil {
 			fmt.Printf("Erro ao fazer o carregamento do .env: %v", err)
-			return
 		}
 		postgreSql, err := db.StartDB()
 		if err != nil {

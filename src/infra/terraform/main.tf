@@ -16,17 +16,6 @@ module "postgresql" {
   supabase_access_token = var.supabase_access_token
 }
 
-module "artifact_registry" {
-  source = "./modules/artifact_registry"
-
-  project_id = var.project_id
-  region = var.region
-  repository_id = var.ar_repository_id
-  description = var.ar_description
-  enable_cleanup_policy = var.ar_enable_cleanup_policy
-  labels = var.ar_labels
-}
-
 module "iam" {
   source = "./modules/iam"
 
@@ -34,6 +23,4 @@ module "iam" {
   project_id           = var.project_id
   admin_email          = var.admin_email
   cloud_tasks_sa_email = module.cloud_tasks.cloud_task_sa_email
-  artifact_registry_sa_email = module.artifact_registry.artifact_registry_sa_email
-  ar_repository = var.ar_repository_id
 }

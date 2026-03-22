@@ -17,13 +17,3 @@ variable "admin_email" {
   type        = string
   description = "Email do Admin do Cloud Tasks"
 }
-
-variable "artifact_registry_sa_email" {
-  type = string
-  description = "Email respectivo a Service Account do Artifact Registry"
-}
-
-variable "ar_repository" {
-  type = string
-  description = "Nome do Repositório Artifact Registry"
-}

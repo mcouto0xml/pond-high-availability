@@ -36,13 +36,14 @@ func (sa *Server) Start() {
 	location := loadEnv("QUEUE_LOCATION", "us-central1")
 	queueID := loadEnv("QUEUE_ID", "fila-bacana")
 	workerURL := loadEnv("WORKER_URL", "google.com")
+	saEmail := loadEnv("SERVICE_ACCOUNT_EMAIL", "sa@gmail.com")
 	
 	cloudTasks, err := config.NewTaskEnqueuer(sa.ctx, projectID, location, queueID)
 	queueImplementation := &config.QueueImplementation{  Context: &cloudTasks,  }
 
 	sa.mux = http.NewServeMux()
 
-	r := endpoints.NewRouter(sa.mux, queueImplementation, workerURL) // <- passar o client aqui
+	r := endpoints.NewRouter(sa.mux, queueImplementation, workerURL, saEmail) // <- passar o client aqui
 
 	sa.httpServer = &http.Server{
 		Addr: sa.Addr,

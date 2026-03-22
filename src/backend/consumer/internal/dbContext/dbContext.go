@@ -1,7 +1,7 @@
 package dbContext
 
 import(
-	"consumer/internal/models"
+	"function.com/consumer/function/internal/models"
 )
 
 type DbContext interface{
