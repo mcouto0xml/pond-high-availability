@@ -7,7 +7,7 @@ env-test:
 
 .PHONY: artefact-build-and-push
 artefact-build:
-	gcloud functions deploy PostTelemetry \
+	gcloud functions deploy telemetry-producer \
   --project=ponderada \
   --gen2 \
   --runtime go126 \

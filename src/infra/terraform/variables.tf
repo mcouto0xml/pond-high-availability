@@ -38,3 +38,18 @@ variable "admin_email" {
   type        = string
   description = "Email do usuário com permissão de Admin no Cloud Tasks"
 }
+
+variable "function_name" {
+  type = string
+  description = "Nome da Cloud Function"
+}
+
+variable "environment_variables" {
+  type = map(string)
+  description = "Variáveis de ambiente do Cloud Function"
+}
+
+variable "function_source_dir" {
+  type = string
+  description = "Diretório da Cloud Function"
+}

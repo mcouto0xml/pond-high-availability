@@ -17,3 +17,8 @@ variable "admin_email" {
   type        = string
   description = "Email do Admin do Cloud Tasks"
 }
+
+variable "function_sa_email" {
+  type = string
+  description = "Email do Service Account do Cloud Function"
+}
