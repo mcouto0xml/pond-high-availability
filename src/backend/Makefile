@@ -31,7 +31,7 @@ curl-producer:
 
 .PHONY: curl-stress
 curl-stress:
-	for i in $$(seq 1 1000); do \
+	for i in $$(seq 1 1000	); do \
 		JSON=$$(python3 -c "import json; print(json.dumps({'iot_name': f'sensor-01', 'temperature': round(20 + $$i * 0.5, 2), 'humidity': round(60 + $$i * 0.8, 2), 'presence': $$i % 2 == 0, 'vibration': round(0.01 + $$i * 0.005, 3), 'luminosity': round(500 + $$i * 20.0, 2), 'tank_level': round(65 + $$i * 0.7, 2)}))"); \
 		curl -s -o /dev/null -w "Request $$i: %{http_code}\n" -X POST http://localhost:8080/telemetry \
 			-H "Content-Type: application/json" \
