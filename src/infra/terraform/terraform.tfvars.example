@@ -1,15 +1,13 @@
 project_id = "ponderada"
-tasks_name = "fila-bacana"
+tasks_name = "fila-legal"
 region = "us-central1"
-admin_email = "email-do-admin@gmail.com"
-supabase_access_token = "acesstokenbemgrandequepegadiretamentenosupabase"
+admin_email = "email_do_admin@gmail.com"
+supabase_access_token = "12345seutoken6789"
 database_region = "us-east-1"
 database_password = "SenhaSecreta123"
-supabase_org_id = "abcdefghijklmnopq"
-ar_repository_id = "cloud_functions_repository"
-ar_description = "Artifact Registry para as Cloud Functions"
-ar_enable_cleanup_policy = true
-ar_labels = {
-  "managed" = "terraform"
-  "app" = "cloud_functions"
+supabase_org_id = "abcdefghijlmnopq"
+function_name = "telemetry-producer"
+function_source_dir = "../../backend/consumer"
+environment_variables = {
+  "DATABASE_URL" = "postgresql://sua-url-do-postgre:5432/postgres"
 }
