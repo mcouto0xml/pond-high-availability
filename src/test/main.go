@@ -191,7 +191,7 @@ func main() {
 	// Flags
 	url := flag.String("url", "http://localhost:8080/telemetry", "Target URL")
 	concurrency := flag.Int("c", 10, "Number of concurrent goroutines")
-	totalReqs := flag.Int("n", 10000, "Total number of requests")
+	totalReqs := flag.Int("n", 1000, "Total number of requests")
 	timeout := flag.Duration("timeout", 10*time.Second, "HTTP request timeout")
 	flag.Parse()
 
