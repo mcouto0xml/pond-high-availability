@@ -1,23 +1,6 @@
 include consumer/.env
 export
 
-.PHONY: env-test
-env-test:
-	echo $(DATABASE_URL)
-
-.PHONY: artefact-build-and-push
-artefact-build:
-	gcloud functions deploy telemetry-producer \
-  --project=ponderada \
-  --gen2 \
-  --runtime go126 \
-  --region us-central1 \
-  --source=./consumer \
-  --entry-point PostTelemetry \
-  --trigger-http \
-  --no-allow-unauthenticated \
-  --set-env-vars DATABASE_URL=$(DATABASE_URL)
-
 
 .PHONY: curl-producer
 curl-producer:
