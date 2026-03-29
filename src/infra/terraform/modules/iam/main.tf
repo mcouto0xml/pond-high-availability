@@ -59,6 +59,24 @@ resource "google_project_iam_member" "admin_viewer" {
   member  = "user:${var.admin_email}"
 }
 
+resource "google_project_iam_member" "admin_functions" {
+  project = var.project_id
+  role = "roles/cloudfunctions.admin"
+  member = "user:${var.admin_email}"
+}
+
+resource "google_project_iam_member" "admin_sau" {
+  project = var.project_id
+  role = "roles/iam.serviceAccountUser"
+  member = "user:${var.admin_email}"
+}
+
+resource "google_project_iam_member" "admin_" {
+  project = var.project_id
+  role = "roles/logging.viewAccessor"
+  member = "user:${var.admin_email}"
+}
+
 # -----------------------------------------------------------------------------
 # Permissão: escritor de Logs do Cloud Functions ServiceAccount
 # -----------------------------------------------------------------------------
