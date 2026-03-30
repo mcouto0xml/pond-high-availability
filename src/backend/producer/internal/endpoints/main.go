@@ -16,7 +16,7 @@ type Router struct{
 
 func NewRouter(mux *http.ServeMux, ct *config.QueueImplementation, wURL string, saEmail string) *Router {
 	// Aqui inicializa as structs de Healthz e Telemtry
-	health := handlers.NewHealthHandler()
+	health := handlers.NewHealthHandler(ct)
 	telemetry := handlers.NewTelemetryInstance(ct, wURL, saEmail)
 
 	r := &Router{	mux: mux, healthInstance: &health, telemetryInstance: &telemetry,  }

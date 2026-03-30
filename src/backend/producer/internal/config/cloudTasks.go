@@ -3,9 +3,10 @@ package config
 import (
 	"context"
 	"fmt"
-
+	"os"
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb"
+	"google.golang.org/api/option"
 )
 
 type TaskEnqueuer struct{
@@ -35,7 +36,10 @@ func NewTaskEnqueuer(ctx *context.Context, pID string, loc string, qID string) (
 }
 
 func (t *TaskEnqueuer) newClient() error {
-	ctClient, err := cloudtasks.NewClient(*t.ctx)
+
+	ctClient, err := cloudtasks.NewClient(*t.ctx,
+    option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")),
+	)
 	if err != nil {
 		return fmt.Errorf("Aconteceu um erro ao criar o Cloud Tasks Client: %v", err)
 	} 
@@ -75,5 +79,17 @@ func (t *TaskEnqueuer) CreateTask(body []byte, workerUrl string, saEmail string)
 
 	fmt.Printf("Task criada com sucesso!: %s\n", task.Name)
 
+	return nil
+}
+
+func (t *TaskEnqueuer) Ping() error {
+	_, err := t.client.GetQueue(*t.ctx, &taskspb.GetQueueRequest{
+		Name: t.QueuePath,
+	})
+	if err != nil {
+		return fmt.Errorf("Ping no Cloud Tasks falhou: %v", err)
+	}
+
+	fmt.Println("Ping no Cloud Tasks bem-sucedido!")
 	return nil
 }

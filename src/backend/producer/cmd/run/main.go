@@ -12,7 +12,6 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Printf("Erro ao fazer o carregamento do .env: %v", err)
-		return
 	}
 	httpServer := server.NewServer(":8080", &ctx)
 	httpServer.Start()

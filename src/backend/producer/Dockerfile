@@ -1,5 +1,5 @@
 # ---- Stage 1: Build ----
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25.6-alpine AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # Compilar o binário
-RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/run/main.go
 
 # ---- Stage 2: Runtime ----
 FROM alpine:3.21
